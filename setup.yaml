@@ -4,7 +4,7 @@
   vars:
     desired_netq_release: "1.4.0"
     desired_ansible_version: "2.5.10"
-    bootcamp_automation_branch: "v3.7.0_citc"
+    bootcamp_automation_branch: "BC_ESR"
   gather_facts: no
   roles:
   - prepare-oob-server
