@@ -1,5 +1,5 @@
 sudo apt-get install -qy  python-dev libssl-dev  sshpass build-essential libffi-dev
-sudo pip install setuptools --upgrade
+sudo pip install setuptools pip --upgrade
 # We have to do this here because Ansible cannot upgrade ansible without bombs going off.
 sudo pip install ansible==2.5.10
 rm -rf ansible-push-keys
