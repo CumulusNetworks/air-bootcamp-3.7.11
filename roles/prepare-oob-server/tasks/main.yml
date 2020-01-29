@@ -3,18 +3,6 @@
   register: cl_release
   changed_when: false
 
-- name: Detect NetQ Vers
-  shell: cat /etc/app-release | grep APPLIANCE_VERSION | cut -d '=' -f2 
-  register: netq_release
-  changed_when: false
-
-- debug: msg="Netq Release {{netq_release.stdout}} clrelease {{cl_release.stdout}}"
-
-- name: Check for Supported NetQ Version
-  assert:
-    that: "netq_release.stdout == desired_netq_release"
-    msg: "This Playbook is written for NetQ version {{desired_netq_release}} but the environment is using version {{netq_release.stdout}}"
-
 - name: Push OOB MOTD
   copy: src=motd dest=/etc/motd
 
@@ -32,27 +20,6 @@
       nameserver 8.8.8.8
       nameserver 8.8.4.4
     dest: /etc/resolv.conf
-
-- name: Adding Jessie Repos
-  copy: 
-    content: |
-      deb  http://deb.debian.org/debian jessie main
-      deb-src  http://deb.debian.org/debian jessie main
-      
-      deb  http://deb.debian.org/debian jessie-updates main
-      deb-src  http://deb.debian.org/debian jessie-updates main
-    dest: /etc/apt/sources.list.d/jessie.list
-
-- name: Update Software Repo
-  apt: name="{{item}}" update_cache=yes
-  with_items:
-   - "isc-dhcp-server"
-   - "tree"
-   - "apache2"
-   - "git"
-   - "python-pip"
-   - "dnsmasq"
-   - "vim"
 
 - name: Detect Ansible Version
   shell: 'if which ansible > /dev/null; then ansible --version | head -n1 | cut -d " " -f2; fi'
@@ -100,14 +67,17 @@
 - name: Enabling DNSMasq
   service: name=dnsmasq state=started enabled=true
 
+- name: Copy dhcpd.conf
+  copy: src=dhcpd.conf dest=/etc/dhcp/dhcpd.conf
+
+- name: Copy dhcpd.hosts
+  copy: src=dhcpd.hosts dest=/etc/dhcp/dhcpd.hosts
+
 - name: Restart DHCP
   service: name=dhcpd state=restarted
 
 - name: Push Vagrant Public Key
-  copy: src=id_rsa.pub dest="{{item}}"
-  with_items:
-  - "/home/cumulus/.ssh/id_rsa.pub"
-  - "/var/www/html/authorized_keys"
+  copy: src=id_rsa.pub dest=/var/www/html/authorized_keys
 
 - name: Push new HTML Index
   copy: 
@@ -133,3 +103,18 @@
 - name: Restart NTP
   service: name=ntp state=restarted
 
+- name: PAT outbound traffic
+  iptables:
+    table: nat
+    chain: POSTROUTING
+    jump: MASQUERADE
+
+- name: Save iptables rules
+  shell: iptables-save > /etc/iptables.up.rules
+
+- name: Load iptables rules on boot
+  copy:
+    src: iptables-up
+    dest: /etc/network/if-pre-up.d/iptables
+    owner: root
+    mode: '0755'

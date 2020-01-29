@@ -2,8 +2,7 @@
   hosts: oob-server
   become: yes
   vars:
-    desired_netq_release: "1.4.0"
-    desired_ansible_version: "2.5.10"
+    desired_ansible_version: "2.4.1.0"
     bootcamp_automation_branch: "BC_ESR"
   gather_facts: no
   roles:
@@ -13,11 +12,10 @@
   hosts: spine*:leaf*
   become: yes
   vars:
-   desired_cl_release: "3.7.0"
+   desired_cl_release: "3.7.11"
   gather_facts: no
   roles:
   - prepare-switches
-  - switch-netq
 
 - name: Work on the Servers
   hosts: server*
@@ -27,4 +25,3 @@
   gather_facts: no
   roles:
   - prepare-servers
-  - server-netq
