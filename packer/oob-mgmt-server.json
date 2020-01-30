@@ -69,7 +69,7 @@
       },
       {
         "type": "ansible-local",
-        "playbook_dir": "../../citc-bootcamp-3.7.0",
+        "playbook_dir": "../../citc-bootcamp-3.7.11",
         "playbook_file": "../setup.yaml",
         "inventory_file": "../hosts",
         "extra_arguments": ["--limit oob-server"]
