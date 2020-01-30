@@ -2,10 +2,8 @@ auto lo
 iface lo inet loopback
 
 auto eth0
-iface eth0
+iface eth0 inet dhcp
     alias Connects (via NAT) To the Internet
-    address 10.255.0.1/16
-    gateway 10.255.0.3
 
 auto eth1
 iface eth1

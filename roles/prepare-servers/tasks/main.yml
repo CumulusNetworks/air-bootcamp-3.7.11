@@ -10,6 +10,31 @@
     that: "ubuntu_release.stdout == desired_ubuntu_release"
     msg: "This Playbook is written for Ubuntu version {{desired_ubuntu_release}} but the environment is using version {{ubuntu_release.stdout}}"
 
+- name: Create cumulus user
+  user:
+    name: cumulus
+    groups:
+      - sudo
+    shell: /bin/bash
+    password: $1$8WOBD1pA$uph5ks6BG29F12dt/ORmE0
+  tags: create_user
+
+- name: Setup password-less sudo
+  copy:
+    content: |
+      cumulus ALL=(ALL) NOPASSWD:ALL
+    dest: /etc/sudoers.d/10_cumulus
+  tags: create_user
+
+- name: Create .ssh directory
+  file:
+    path: /home/cumulus/.ssh
+    state: directory
+    mode: 0700
+    owner: cumulus
+    group: cumulus
+  tags: create_user
+
 - name: Remove MOTD Restart Warnings
   file:
     path: /etc/update-motd.d/98-reboot-required
@@ -17,15 +42,6 @@
 
 - name: Set DHCP to never Timeout
   copy: src=dhclient.conf dest=/etc/dhcp/dhclient.conf
-
-- name: Install Packages
-  apt: name={{item}} update_cache=yes
-  with_items:
-    - "ifupdown2"
-    - "python-ipaddr"
-    - "python-argcomplete"
-    - "lldpd"
-    - "ntp"
 
 - name: Deploy LLDPD configuration
   copy:
@@ -54,3 +70,10 @@
 - name: Copy NTP Configuration
   copy: src=ntp.conf dest=/etc/ntp.conf
 
+- name: Copy DHCP exit hook for setting hostname
+  copy: src=dhcp-sethostname dest=/etc/dhcp/dhclient-exit-hooks.d/dhcp-sethostname
+
+- name: Push Interface Config
+  copy:
+    src: interfaces
+    dest: /etc/network/interfaces

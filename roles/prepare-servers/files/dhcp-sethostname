@@ -1,0 +1,10 @@
+# This script sets the machine hostname to the hostname sent from the DHCP server.
+# If you want to enable this script, change SETHOSTNAME to "yes"
+# Copyright 2013, 2015, 2017, Cumulus Networks, Inc.  All rights reserved.
+SETHOSTNAME="yes"
+if [ $SETHOSTNAME = "yes" ] && [ ! -z $new_host_name ]
+then
+    hostname $new_host_name
+    sed --in-place -e "/127\.0\.1\.1/s/^.*$/127.0.1.1  $new_host_name/" /etc/hosts
+fi
+sync

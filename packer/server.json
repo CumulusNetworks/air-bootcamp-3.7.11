@@ -1,0 +1,63 @@
+{
+    "variables": {
+      "iso_url": "https://cloud-images.ubuntu.com/xenial/current/xenial-server-cloudimg-amd64-disk1.img",
+      "iso_checksum_url": "https://cloud-images.ubuntu.com/xenial/current/SHA256SUMS"
+    },
+    "builders":
+    [
+      {
+        "accelerator": "none",
+        "boot_wait": "3s",
+        "disk_image": true,
+        "disk_size": 10000,
+        "format": "qcow2",
+        "iso_checksum_url": "{{user `iso_checksum_url`}}",
+        "iso_url": "{{user `iso_url`}}",
+        "shutdown_command": "sudo -S shutdown -P now",
+        "ssh_private_key_file": "./artifacts/id_rsa",
+        "ssh_username": "ubuntu",
+        "ssh_timeout": "20m",
+        "type": "qemu",
+        "use_default_display": true,
+        "qemuargs": [
+          ["-fda", "./artifacts/seed.img"],
+          ["-smp", "2"],
+          ["-m", "1024"],
+          ["-enable-kvm"]
+        ],
+        "vm_name": "server.qcow2"
+      }
+    ],
+    "provisioners": [
+      {
+        "type": "file",
+        "source": "./artifacts/id_rsa.pub",
+        "destination": "/tmp/authorized_keys"
+      },
+      {
+        "type": "ansible",
+        "playbook_file": "../setup.yaml",
+        "groups": "server",
+        "extra_arguments": ["-t create_user"]
+      },
+      {
+        "type": "shell",
+        "inline": [
+          "mv /tmp/authorized_keys /home/cumulus/.ssh/authorized_keys",
+          "chown cumulus:cumulus /home/cumulus/.ssh/authorized_keys",
+          "echo 'UseDNS no' >> /etc/ssh/sshd_config",
+          "sed -i 's/ console=ttyS0//g' /etc/default/grub.d/50-cloudimg-settings.cfg",
+          "update-grub",
+          "apt update -o Acquire::ForceIPv4=true",
+          "apt install ifupdown2 python-ipaddr python-argcomplete lldpd ntp -y -o Acquire::ForceIPv4=true",
+          "usermod --shell /usr/sbin/nologin ubuntu"
+        ],
+        "execute_command": "sudo sh -c '{{ .Path }}'"
+      },
+      {
+        "type": "ansible",
+        "playbook_file": "../setup.yaml",
+        "groups": "server"
+      }
+    ]
+  }

@@ -1,0 +1,49 @@
+{
+    "variables": {
+      "iso_url": "http://cumulusfiles.s3.amazonaws.com/CumulusLinux-3.7.11/cumulus-linux-3.7.11-vx-amd64-qemu.qcow2",
+      "iso_checksum": "C00E0B1C70B53B5A08F2F53ECB7AB88B8641EBAF103A76EC74DA9E6E430BBD9A",
+      "ssh_username": "cumulus",
+      "ssh_password": ""
+    },
+    "builders":
+    [
+      {
+        "accelerator": "none",
+        "boot_wait": "3s",
+        "disk_image": true,
+        "format": "qcow2",
+        "iso_checksum": "{{user `iso_checksum`}}",
+        "iso_url": "{{user `iso_url`}}",
+        "shutdown_command": "sudo -S shutdown -P now",
+        "ssh_password": "{{user `ssh_password`}}",
+        "ssh_username": "{{user `ssh_username`}}",
+        "ssh_timeout": "20m",
+        "type": "qemu",
+        "use_default_display": true,
+        "qemuargs": [
+          ["-smp", "2"],
+          ["-m", "1024"],
+          ["-enable-kvm"]
+        ],
+        "vm_name": "switch.qcow2"
+      }
+    ],
+    "provisioners": [
+      {
+        "type": "file",
+        "source": "./artifacts/id_rsa.pub",
+        "destination": "/tmp/authorized_keys"
+      },
+      {
+        "type": "shell",
+        "inline": [
+          "mkdir /home/cumulus/.ssh",
+          "mv /tmp/authorized_keys /home/cumulus/.ssh/authorized_keys",
+          "chown cumulus:cumulus /home/cumulus/.ssh",
+          "echo 'cumulus ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/10_cumulus",
+          "echo 'UseDNS no' >> /etc/ssh/sshd_config"
+        ],
+        "execute_command": "echo {{user `ssh_password`}} | sudo -S sh -c '{{ .Path }}'"
+      }
+    ]
+  }
