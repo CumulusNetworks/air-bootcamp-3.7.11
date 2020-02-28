@@ -36,4 +36,6 @@ group {
 
  host internet {hardware ethernet a0:00:00:00:00:50; fixed-address 192.168.0.253; option host-name "internet"; option cumulus-provision-url "http://192.168.0.254/ztp_oob.sh";  }
 
+ host netq-ts {hardware ethernet a0:00:00:00:02:50; fixed-address 192.168.0.250; option host-name "netq-ts"; }
+
 }#End of static host group
