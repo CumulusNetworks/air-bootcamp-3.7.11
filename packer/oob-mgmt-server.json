@@ -78,8 +78,7 @@
         "execute_command": "echo {{user `ssh_password`}} | sudo -S sh -c '{{ .Path }}'"
       },
       {
-        "type": "ansible-local",
-        "playbook_dir": "../../air-bootcamp-3.7.11",
+        "type": "ansible",
         "playbook_file": "../setup.yaml",
         "inventory_file": "../hosts",
         "extra_arguments": ["--limit oob-server"]
