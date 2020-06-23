@@ -18,6 +18,7 @@
     shell: /bin/bash
     password: $1$8WOBD1pA$uph5ks6BG29F12dt/ORmE0
   tags: create_user
+  become: yes
 
 - name: Setup password-less sudo
   copy:
@@ -25,6 +26,7 @@
       cumulus ALL=(ALL) NOPASSWD:ALL
     dest: /etc/sudoers.d/10_cumulus
   tags: create_user
+  become: yes
 
 - name: Create .ssh directory
   file:
@@ -34,6 +36,7 @@
     owner: cumulus
     group: cumulus
   tags: create_user
+  become: yes
 
 - name: Remove MOTD Restart Warnings
   file:
@@ -77,3 +80,22 @@
   copy:
     src: interfaces
     dest: /etc/network/interfaces
+
+- name: Download air-agent
+  git:
+    repo: 'https://gitlab.com/cumulus-consulting/air/air-agent.git'
+    dest: /tmp/air-agent
+  tags: air-agent
+
+- name: Install air-agent
+  shell:
+    cmd: ./install.sh
+    chdir: /tmp/air-agent
+  become: yes
+  tags: air-agent
+
+- name: Cleanup agent files
+  file:
+    path: /tmp/air-agent
+    state: absent
+  tags: air-agent

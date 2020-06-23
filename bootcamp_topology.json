@@ -1,9 +1,9 @@
 {
-    "name": "Cumulus Linux Bootcamp",
+    "name": "Cumulus Linux Boot Camp",
     "nodes": [
         {
             "name": "oob-mgmt-switch",
-            "os": "474b4b92-b66e-4c0f-823e-b09d20e1207c",
+            "os": "3942d9a7-5819-416b-aebd-edd3f6176dcb",
             "memory": 1024,
             "storage": 10,
             "cpu": 1,
@@ -85,7 +85,7 @@
         },
         {
             "name": "oob-mgmt-server",
-            "os": "92c54399-4728-45bb-bdc5-90a7fd6e0a30",
+            "os": "7d960f0b-a356-471c-afe7-dca0bfe563d9",
             "memory": 1024,
             "storage": 10,
             "cpu": 1,
@@ -101,7 +101,7 @@
         },
         {
             "name": "spine01",
-            "os": "bc3eea01-e9ff-47c3-a633-9d90d4c67468",
+            "os": "53d1436f-ca9a-4d1b-a2f3-06573587eaf1",
             "memory": 1024,
             "storage": 10,
             "cpu": 1,
@@ -132,7 +132,7 @@
         },
         {
             "name": "spine02",
-            "os": "bc3eea01-e9ff-47c3-a633-9d90d4c67468",
+            "os": "53d1436f-ca9a-4d1b-a2f3-06573587eaf1",
             "memory": 1024,
             "storage": 10,
             "cpu": 1,
@@ -163,7 +163,7 @@
         },
         {
             "name": "leaf01",
-            "os": "bc3eea01-e9ff-47c3-a633-9d90d4c67468",
+            "os": "53d1436f-ca9a-4d1b-a2f3-06573587eaf1",
             "memory": 1024,
             "storage": 10,
             "cpu": 1,
@@ -203,7 +203,7 @@
         },
         {
             "name": "leaf02",
-            "os": "bc3eea01-e9ff-47c3-a633-9d90d4c67468",
+            "os": "53d1436f-ca9a-4d1b-a2f3-06573587eaf1",
             "memory": 1024,
             "storage": 10,
             "cpu": 1,
@@ -243,7 +243,7 @@
         },
         {
             "name": "leaf03",
-            "os": "bc3eea01-e9ff-47c3-a633-9d90d4c67468",
+            "os": "53d1436f-ca9a-4d1b-a2f3-06573587eaf1",
             "memory": 1024,
             "storage": 10,
             "cpu": 1,
@@ -283,7 +283,7 @@
         },
         {
             "name": "leaf04",
-            "os": "bc3eea01-e9ff-47c3-a633-9d90d4c67468",
+            "os": "53d1436f-ca9a-4d1b-a2f3-06573587eaf1",
             "memory": 1024,
             "storage": 10,
             "cpu": 1,
@@ -323,7 +323,7 @@
         },
         {
             "name": "server01",
-            "os": "55c8edb8-53b1-4efd-8d3c-db7250d9b6ad",
+            "os": "3b8f398c-47e7-4987-95e0-fa75a5986783",
             "memory": 1024,
             "storage": 10,
             "cpu": 1,
@@ -342,7 +342,7 @@
         },
         {
             "name": "server02",
-            "os": "55c8edb8-53b1-4efd-8d3c-db7250d9b6ad",
+            "os": "3b8f398c-47e7-4987-95e0-fa75a5986783",
             "memory": 1024,
             "storage": 10,
             "cpu": 1,
@@ -361,7 +361,7 @@
         },
         {
             "name": "server03",
-            "os": "55c8edb8-53b1-4efd-8d3c-db7250d9b6ad",
+            "os": "3b8f398c-47e7-4987-95e0-fa75a5986783",
             "memory": 1024,
             "storage": 10,
             "cpu": 1,
@@ -380,7 +380,7 @@
         },
         {
             "name": "server04",
-            "os": "55c8edb8-53b1-4efd-8d3c-db7250d9b6ad",
+            "os": "3b8f398c-47e7-4987-95e0-fa75a5986783",
             "memory": 1024,
             "storage": 10,
             "cpu": 1,
@@ -394,6 +394,23 @@
                 },
                 {
                     "name": "eth2"
+                }
+            ]
+        },
+        {
+            "name": "netq-ts",
+            "os": "c60a5889-9bac-4a9a-a8ed-9a6fac332d47",
+            "memory": 4096,
+            "storage": 30,
+            "cpu": 2,
+            "interfaces": [
+                {
+                    "name": "eth0",
+                    "outbound": true
+                },
+                {
+                    "name": "eth1",
+                    "mac_address": "a0:00:00:00:02:50"
                 }
             ]
         }
@@ -780,6 +797,18 @@
                 {
                     "node": "oob-mgmt-switch",
                     "interface": "swp23"
+                }
+            ]
+        },
+        {
+            "interfaces": [
+                {
+                    "node": "netq-ts",
+                    "interface": "eth1"
+                },
+                {
+                    "node": "oob-mgmt-switch",
+                    "interface": "swp22"
                 }
             ]
         }

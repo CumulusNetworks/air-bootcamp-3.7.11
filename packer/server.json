@@ -53,21 +53,20 @@
           "echo 'UseDNS no' >> /etc/ssh/sshd_config",
           "sed -i 's/ console=ttyS0//g' /etc/default/grub.d/50-cloudimg-settings.cfg",
           "update-grub",
-          "echo 'deb http://apps3.cumulusnetworks.com/repos/deb xenial netq-2.4' >> /etc/apt/sources.list",
+          "echo 'deb [arch=amd64] https://apps3.cumulusnetworks.com/repos/deb xenial netq-latest' >> /etc/apt/sources.list",
           "apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 7EB364B4A88BBC95",
           "apt update -o Acquire::ForceIPv4=true",
-          "apt install ifupdown2 python-ipaddr python-argcomplete lldpd ntp cumulus-netq -y -o Acquire::ForceIPv4=true",
+          "apt install git ifupdown2 python-ipaddr python-argcomplete lldpd ntp netq-agent netq-apps -y -o Acquire::ForceIPv4=true",
           "usermod --shell /usr/sbin/nologin ubuntu",
-          "mv /tmp/netq.yml /etc/netq/netq.yml",
-          "netq config restart agent",
-          "netq config restart cli"
+          "mv /tmp/netq.yml /etc/netq/netq.yml"
         ],
         "execute_command": "sudo sh -c '{{ .Path }}'"
       },
       {
         "type": "ansible",
         "playbook_file": "../setup.yaml",
-        "groups": "server"
+        "groups": ["server"],
+        "user": "air"
       }
     ]
   }

@@ -1,0 +1,70 @@
+{
+    "variables": {
+      "iso_url": "netq-3.0.0-ubuntu-18.04-tscloud-qemu.qcow2",
+      "iso_checksum": "599C3AA617937156D38A2205B4D111F83EBCFD63EDA7A791060375B30CB1DA90",
+      "netq_config_key": "",
+      "ssh_username": "cumulus",
+      "ssh_password": ""
+    },
+    "builders":
+    [
+      {
+        "accelerator": "none",
+        "boot_wait": "3s",
+        "disk_image": true,
+        "format": "qcow2",
+        "iso_checksum": "{{user `iso_checksum`}}",
+        "iso_url": "{{user `iso_url`}}",
+        "shutdown_command": "sudo -S shutdown -P now",
+        "ssh_password": "{{user `ssh_password`}}",
+        "ssh_username": "{{user `ssh_username`}}",
+        "ssh_timeout": "20m",
+        "type": "qemu",
+        "use_default_display": true,
+        "qemuargs": [
+          ["-smp", "4"],
+          ["-m", "8192"],
+          ["-enable-kvm"],
+          ["-netdev", "user,id=net0,hostfwd=tcp::{{ .SSHHostPort }}-:22,id=forward"],
+          [ "-device", "virtio-net,netdev=net0"],
+          ["-netdev", "user,id=net1" ],
+          ["-device", "virtio-net,netdev=net1"]
+        ],
+        "vm_name": "netq-ts.qcow2"
+      }
+    ],
+    "provisioners": [
+      {
+        "type": "file",
+        "source": "./artifacts/id_rsa.pub",
+        "destination": "/tmp/authorized_keys"
+      },
+      {
+        "type": "file",
+        "source": "../roles/netq-ts/files/01-netcfg.yaml",
+        "destination": "/tmp/01-netcfg.yaml"
+      },
+      {
+        "type": "ansible",
+        "playbook_file": "../setup.yaml",
+        "groups": ["server"],
+        "user": "air",
+        "extra_arguments": ["-t", "create_user,air-agent", "--extra-vars", "ansible_sudo_pass={{user `ssh_password`}}"]
+      },
+      {
+        "type": "shell",
+        "inline": [
+          "hostnamectl set-hostname netq-ts",
+          "mv /tmp/01-netcfg.yaml /etc/netplan/01-netcfg.yaml",
+          "rm -f /etc/netplan/01-eth0.yaml",
+          "sudo netplan apply",
+          "mv /tmp/authorized_keys /home/cumulus/.ssh/authorized_keys",
+          "chown cumulus:cumulus /home/cumulus/.ssh/authorized_keys",
+          "echo 'UseDNS no' >> /etc/ssh/sshd_config",
+          "netq bootstrap master interface eth1 tarball /mnt/installables/netq-bootstrap-3.0.0.tgz",
+          "netq install opta standalone full interface eth1 bundle /mnt/installables/NetQ-3.0.0-opta.tgz config-key {{user `netq_config_key`}}"
+        ],
+        "execute_command": "echo {{user `ssh_password`}} | sudo -S sh -c '{{ .Path }}'"
+      }
+    ]
+  }

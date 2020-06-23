@@ -10,3 +10,22 @@
     that: "cl_release.stdout == desired_cl_release"
     msg: "This Playbook is written for CL version {{desired_cl_release}} but the environment is using version {{cl_release.stdout}}"
 
+- name: Download air-agent
+  git:
+    repo: 'https://gitlab.com/cumulus-consulting/air/air-agent.git'
+    dest: /tmp/air-agent
+    version: python3.4
+  tags: air-agent
+
+- name: Install air-agent
+  shell:
+    cmd: ./install.sh
+    chdir: /tmp/air-agent
+  become: yes
+  tags: air-agent
+
+- name: Cleanup agent files
+  file:
+    path: /tmp/air-agent
+    state: absent
+  tags: air-agent

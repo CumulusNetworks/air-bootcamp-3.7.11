@@ -8,6 +8,13 @@
   roles:
   - prepare-oob-server
 
+- name: Work on OOB-Switch
+  hosts: oob-switch
+  become: yes
+  gather_facts: no
+  roles:
+  - prepare-oob-switch
+
 - name: Work on the Switches
   hosts: spine*:leaf*
   become: yes

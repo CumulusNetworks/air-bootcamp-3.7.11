@@ -47,15 +47,21 @@
           "chown cumulus:cumulus /home/cumulus/.ssh",
           "echo 'cumulus ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/10_cumulus",
           "echo 'UseDNS no' >> /etc/ssh/sshd_config",
-          "echo 'deb http://apps3.cumulusnetworks.com/repos/deb CumulusLinux-3 netq-2.4' >> /etc/apt/sources.list",
+          "echo 'deb http://apps3.cumulusnetworks.com/repos/deb CumulusLinux-3 netq-3.0' >> /etc/apt/sources.list",
           "apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 7EB364B4A88BBC95",
+          "echo 'deb http://deb.debian.org/debian/ jessie main' >> /etc/apt/sources.list",
           "apt update -o Acquire::ForceIPv4=true",
-          "apt install cumulus-netq -y -o Acquire::ForceIPv4=true",
+          "apt install netq-agent netq-apps git build-essential libssl-dev libffi-dev python3-dev python3-setuptools -y -o Acquire::ForceIPv4=true",
           "mv /tmp/netq.yml /etc/netq/netq.yml",
-          "netq config restart agent",
-          "netq config restart cli"
+          "sudo easy_install3 pip==19.3.1"
         ],
         "execute_command": "echo {{user `ssh_password`}} | sudo -S sh -c '{{ .Path }}'"
+      },
+      {
+        "type": "ansible",
+        "playbook_file": "../setup.yaml",
+        "groups": ["spine"],
+        "user": "air"
       }
     ]
   }

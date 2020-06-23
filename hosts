@@ -1,5 +1,6 @@
 [oob]
 oob-server ansible_host=localhost 
+oob-switch
 
 [spine]
 spine01 ansible_host=192.168.0.21

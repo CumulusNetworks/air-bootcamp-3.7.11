@@ -36,6 +36,8 @@ packer build -var 'ssh_password=<PASSWORD>' oob-mgmt-server.json
 packer build -var 'ssh_password=<PASSWORD>' oob-mgmt-switch.json
 packer build -var 'ssh_password=<PASSWORD>' switch.json
 packer build server.json
+# Requires OPTA image to be pre-downloaded
+packer build -var 'netq_config_key=<PLACEHOLDER_KEY>' -var 'ssh_password=<PASSWORD>' netq-ts.json
 ```
 
 The resulting images can now be uploaded into Cumulus AIR and built into a bootcamp topology. An example topology definition is provided in `bootcamp_topology.json`.

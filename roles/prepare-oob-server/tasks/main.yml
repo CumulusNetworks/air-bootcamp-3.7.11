@@ -109,12 +109,42 @@
     chain: POSTROUTING
     jump: MASQUERADE
 
-- name: Save iptables rules
-  shell: iptables-save > /etc/iptables.up.rules
+- name: Set default IPv4 option for iptables-persistent
+  debconf:
+    name: iptables-persistent
+    question: iptables-persistent/autosave_v4
+    value: true
+    vtype: boolean
 
-- name: Load iptables rules on boot
-  copy:
-    src: iptables-up
-    dest: /etc/network/if-pre-up.d/iptables
-    owner: root
-    mode: '0755'
+- name: Set default IPv6 option for iptables-persistent
+  debconf:
+    name: iptables-persistent
+    question: iptables-persistent/autosave_v6
+    value: true
+    vtype: boolean
+
+- name: Install iptables-persistent
+  apt:
+    name: iptables-persistent
+    state: present
+    update_cache: no
+
+- name: Download air-agent
+  git:
+    repo: 'https://gitlab.com/cumulus-consulting/air/air-agent.git'
+    dest: /tmp/air-agent
+    version: python3.4
+  tags: air-agent
+
+- name: Install air-agent
+  shell:
+    cmd: ./install.sh
+    chdir: /tmp/air-agent
+  become: yes
+  tags: air-agent
+
+- name: Cleanup agent files
+  file:
+    path: /tmp/air-agent
+    state: absent
+  tags: air-agent
