@@ -99,3 +99,14 @@
     path: /tmp/air-agent
     state: absent
   tags: air-agent
+
+- name: Enable serial console (required for Ubuntu 16.04)
+  lineinfile:
+    path: /etc/default/grub
+    regexp: '^GRUB_CMDLINE_LINUX='
+    line: GRUB_CMDLINE_LINUX="console=tty1 console=ttyS0"
+  become: yes
+
+- name: Update grub config
+  shell: update-grub
+  become: yes
